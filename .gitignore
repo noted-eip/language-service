@@ -18,3 +18,6 @@ service
 # Environement files
 .env
 
+# grpc specific
+grpc/*
+!grpc/protos

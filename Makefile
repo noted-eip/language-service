@@ -7,7 +7,7 @@ re:
 
 # Run the protoc compiler to generate the Golang server code.
 codegen: update-submodules
-	protoc --go_out=. --go-grpc_out=. grpc/protos/notes/*.proto
+	protoc --go_out=. --go-grpc_out=. grpc/protos/recommendations/*.proto
 
 # Fetch the latest version of the protos submodule.
 update-submodules:
