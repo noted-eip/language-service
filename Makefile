@@ -1,16 +1,12 @@
-
-# Create an executable for service note
-re:
-	rm go.mod
-	go mod init service
-	go build
-
 # Run the protoc compiler to generate the Golang server code.
 codegen: update-submodules
-	protoc --go_out=. --go-grpc_out=. grpc/protos/recommendations/*.proto
+	docker run --rm -v `pwd`/grpc:/app/grpc -v `pwd`/misc:/app/misc -w /app noted-go-protoc /bin/sh -c misc/gen_proto.sh
 
 # Fetch the latest version of the protos submodule.
 update-submodules:
+	git submodule update --remote
+
+# After cloning the repo, run init
+init:
 	git submodule init
-#	git submodule update --remote
-	git pull --recurse-submodules
+	docker build -t noted-go-protoc -f misc/Dockerfile .
