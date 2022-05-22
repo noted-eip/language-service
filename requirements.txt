@@ -1,0 +1,7 @@
+# gRPC deps
+grpcio-tools
+googleapis-common-protos
+
+python-dotenv # dotenv
+
+git+https://github.com/boudinfl/pke.git # Keyword Extraction Toolkit
