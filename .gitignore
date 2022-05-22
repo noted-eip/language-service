@@ -21,3 +21,4 @@ service
 # grpc specific
 grpc/*
 !grpc/protos
+recommendationspb

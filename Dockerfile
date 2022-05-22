@@ -1,25 +1,29 @@
 FROM python:3.10-alpine
 
+# TODO : Change to python venv or keep the "docker-user" - Pbbly not as simple as it seems
+
 WORKDIR /app
 
 # Install protobuf
 RUN apk update && apk add --no-cache make protobuf-dev=3.18.1-r1
 
-# Create user to not use pip as root
-RUN adduser -D pip-user
-USER pip-user
-ENV PATH="/home/pip-user/.local/bin:${PATH}"
+# Create user to not use pip as root and give according ownership to manipulate future files
+RUN adduser -D docker-user
+RUN chown docker-user:docker-user .
+USER docker-user
+ENV PATH="/home/docker-user/.local/bin:${PATH}"
 
-# Install/Upgrade pip
-RUN python3 -m pip install --upgrade pip
+# Upgrade pip (last flag supress current version warning)
+RUN python3 -m pip install --upgrade pip --disable-pip-version-check
 
 # Copy every file and give the right permissions/ownership
-COPY --chown=pip-user:pip-user . .
+COPY --chown=docker-user:docker-user . .
 
-# Install proto-dependencies and generate code
-RUN python3 -m pip install --no-cache-dir grpcio-tools
-RUN python3 -m pip install --no-cache-dir googleapis-common-protos
+# Install proto-dependencies
+RUN pip install -r requirements.txt
+
 RUN ./misc/gen_proto.sh
+RUN ./misc/download_language_models.sh
 
 ENTRYPOINT [ "python3", "recommendations-service.py" ]
 

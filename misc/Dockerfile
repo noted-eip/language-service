@@ -3,5 +3,13 @@
 FROM python:3.10-alpine
 
 RUN apk update && apk add --no-cache make protobuf-dev=3.18.1-r1
-RUN pip install --no-cache-dir grpcio-tools
-RUN pip install --no-cache-dir googleapis-common-protos
+
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+RUN pip install --upgrade pip
+
+# Install dependencies:
+COPY requirements.txt .
+RUN pip install -r requirements.txt
