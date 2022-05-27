@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Variable definition and init
 SERVICE_NAME="recommendations"
 PROTOC_TOOL="python -m grpc_tools.protoc" # Could be hardcoded in CMD later on
