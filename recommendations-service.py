@@ -1,41 +1,31 @@
-from concurrent import futures # in order to use threads
-from dotenv import load_dotenv # dotenv
+import os
+from dotenv import load_dotenv 
+from concurrent import futures 
 
-# grpc and recommendations messages
 import grpc
 import recommendationspb.recommendations_pb2_grpc as pb2_grpc
 import recommendationspb.recommendations_pb2 as pb2
 
-# Logger
-from loguru import logger
-
-# Keyphrase extraction framework
 import pke
 from pke.lang import stopwords 
 
-import os # getenv
+from loguru import logger
 
-
-"""
-Long term, we will have multiple algorithm to choose from
-"""
+# TODO : Better logs (account service's json + format) + Class doc
 
 class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
 
-    extractor           = pke.unsupervised.YAKE()
-
+    extractor = pke.unsupervised.YAKE()
 
     def __init__(self, *args, **kwargs):
-        self.lang                =       os.getenv("AI_LANG")                 or 'fr'
-        self.number_of_results   = int  (os.getenv("AI_NUMBER_OF_KEYWORDS"))  or 5
-        self.n_gram_length       = int  (os.getenv("AI_N_GRAM_LENGTH"))       or 2 # between 1 and 3
-        self.co_occurence_window = int  (os.getenv("AI_CO_OCCURENCE_WINDOW")) or 3 
-        self.threshold           = float(os.getenv("AI_THRESHOLD"))           or 0.75 
-
-        logger.info("Recommendation service has been successfully initialized")
+        self.lang                =       os.getenv("RECOMMENDATION_SERVICE_LANG")                 or 'fr'
+        self.number_of_results   = int  (os.getenv("RECOMMENDATION_SERVICE_NUMBER_OF_KEYWORDS"))  or 5
+        self.n_gram_length       = int  (os.getenv("RECOMMENDATION_SERVICE_N_GRAM_LENGTH"))       or 2 # between 1 and 3
+        self.co_occurence_window = int  (os.getenv("RECOMMENDATION_SERVICE_CO_OCCURENCE_WINDOW")) or 3 
+        self.threshold           = float(os.getenv("RECOMMENDATION_SERVICE_THRESHOLD"))           or 0.75 
 
     def __candidate_selection_and_weighting(self):
-        logger.debug("Candidate selection and weighting being processed")
+        logger.debug(f"Candidate selection : n gram length: {self.n_gram_length} ; co occurence window: {self.co_occurence_window}")
         self.extractor.candidate_selection(n=self.n_gram_length)
         self.extractor.candidate_weighting(window=self.co_occurence_window, use_stems=False)
 
@@ -53,9 +43,6 @@ class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
         keywords = [keyword_info[0] for keyword_info in keywords_verbose]
 
         result = {'keywords': keywords}
-
-        logger.debug(f"Response: {keywords}")
-        logger.info("ExtractKeywords response being sent")
 
         return pb2.ExtractKeywordsReply(**result)
 
