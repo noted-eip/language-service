@@ -6,16 +6,8 @@ init-submodules:
 update-submodules:
 	git submodule update --remote
 
-# Builds a Docker image that'll run the recommendations service
-service-build: init-submodules update-submodules
-	docker build -t noted-recommendations-service -f Dockerfile .
+build: init-submodules update-submodules
+	docker build -t recommendations-service -f Dockerfile .
 
-
-# placeholder
-service-run:
-	docker run noted-recommendations-service -d -p 8080:8080
-# placeholder
-
-
-
-
+run:
+	docker run recommendations-service -d -p 8080:8080
