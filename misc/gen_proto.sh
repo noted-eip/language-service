@@ -1,3 +1,4 @@
+# Script to generate protobufs files and do some clean up among them
 #!/bin/bash
 
 # Variable definition and init
