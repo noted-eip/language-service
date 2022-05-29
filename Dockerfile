@@ -30,4 +30,4 @@ RUN python3 -m venv $VIRTUAL_ENV
 
 ENTRYPOINT [ "python3", "recommendations-service.py" ]
 
-EXPOSE 8080
+EXPOSE 3000
