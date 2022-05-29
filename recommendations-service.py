@@ -55,8 +55,8 @@ def get_required_env_variable(name: str) -> str:
 
 # TODO: server.py or main.py
 def serve():
-    port = get_required_env_variable("PORT");
-    max_workers = os.getenv("MAX_WORKERS") or 8;
+    port = get_required_env_variable("RECOMMENDATIONS_SERVICE_PORT");
+    max_workers = os.getenv("RECOMMENDATIONS_SERVICE_MAX_WORKERS") or 8;
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
     
