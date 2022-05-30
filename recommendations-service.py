@@ -1,4 +1,4 @@
-import os
+import os, sys, json
 from dotenv import load_dotenv 
 from concurrent import futures 
 
@@ -18,11 +18,11 @@ class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
     extractor = pke.unsupervised.YAKE()
 
     def __init__(self, *args, **kwargs):
-        self.lang                =       os.getenv("RECOMMENDATION_SERVICE_LANG")                 or 'fr'
-        self.number_of_results   = int  (os.getenv("RECOMMENDATION_SERVICE_NUMBER_OF_KEYWORDS"))  or 5
-        self.n_gram_length       = int  (os.getenv("RECOMMENDATION_SERVICE_N_GRAM_LENGTH"))       or 2 # between 1 and 3
-        self.co_occurence_window = int  (os.getenv("RECOMMENDATION_SERVICE_CO_OCCURENCE_WINDOW")) or 3 
-        self.threshold           = float(os.getenv("RECOMMENDATION_SERVICE_THRESHOLD"))           or 0.75 
+        self.lang                =       os.getenv("RECOMMENDATIONS_SERVICE_LANG")                 or 'fr'
+        self.number_of_results   = int  (os.getenv("RECOMMENDATIONS_SERVICE_NUMBER_OF_KEYWORDS"))  or 5
+        self.n_gram_length       = int  (os.getenv("RECOMMENDATIONS_SERVICE_N_GRAM_LENGTH"))       or 2 # between 1 and 3
+        self.co_occurence_window = int  (os.getenv("RECOMMENDATIONS_SERVICE_CO_OCCURENCE_WINDOW")) or 3 
+        self.threshold           = float(os.getenv("RECOMMENDATIONS_SERVICE_THRESHOLD"))           or 0.75 
 
     def __candidate_selection_and_weighting(self):
         logger.debug(f"Candidate selection : n gram length: {self.n_gram_length} ; co occurence window: {self.co_occurence_window}")
@@ -70,5 +70,6 @@ def serve():
 
 # TODO: main.py
 if __name__ == '__main__':
+    change_loguru_format()
     load_dotenv()
     serve()
