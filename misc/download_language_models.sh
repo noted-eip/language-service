@@ -1,5 +1,5 @@
-# Script used to download wanted languages models used by python package `spacy` (used by`pke`, the current keyword extraction toolkit)  
 #!/bin/bash
+# Script used to download wanted languages models used by python package `spacy` (used by`pke`, the current keyword extraction toolkit)  
 
 models_array=("fr_dep_news_trf")
 
