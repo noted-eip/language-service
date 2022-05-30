@@ -10,4 +10,4 @@ build: init-submodules update-submodules
 	docker build -t recommendations-service -f Dockerfile .
 
 run:
-	docker run recommendations-service -d -p 8080:8080
+	docker run recommendations-service -d -p 3000:3000

@@ -1,5 +1,5 @@
-# Script to generate protobufs files and do some clean up among them
 #!/bin/bash
+# Script to generate protobufs files and do some clean up among them
 
 # Variable definition and init
 SERVICE_NAME="recommendations"
