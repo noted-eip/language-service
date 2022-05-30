@@ -22,3 +22,6 @@ service
 grpc/*
 !grpc/protos
 recommendationspb
+
+# IDE
+.vscode
