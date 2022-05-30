@@ -70,6 +70,5 @@ def serve():
 
 # TODO: main.py
 if __name__ == '__main__':
-    change_loguru_format()
     load_dotenv()
     serve()
