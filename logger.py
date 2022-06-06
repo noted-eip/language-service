@@ -5,7 +5,7 @@ import json
 
 def __serialize(record):
     print(record)
-    subset = {"level": record["level"].name.lower(), "ts": int(record["time"].timestamp()), "message": record["message"], **record["extra"]}
+    subset = {"level": record["level"].name.lower(), "ts": int(record["time"].timestamp()), "msg": record["message"], **record["extra"]}
     return json.dumps(subset)
 
 def __sink(message):
