@@ -4,7 +4,6 @@ import json
 # For later sprints, a sink could/should be this https://docs.python.org/3/glossary.html#term-file-object
 
 def __serialize(record):
-    print(record)
     subset = {"level": record["level"].name.lower(), "ts": int(record["time"].timestamp()), "msg": record["message"], **record["extra"]}
     return json.dumps(subset)
 
