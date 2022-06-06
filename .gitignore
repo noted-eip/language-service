@@ -25,3 +25,6 @@ recommendationspb
 
 # IDE
 .vscode
+
+# Python
+__pycache__

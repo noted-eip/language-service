@@ -48,7 +48,7 @@ misc/gen_proto.sh
 ## Run the service
 
 ```bash
-python3 recommendations-service.py
+python3 recommendations_service.py
 ```
 
 ## Docker
