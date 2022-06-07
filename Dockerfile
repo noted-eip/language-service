@@ -21,7 +21,7 @@ RUN ./misc/download_language_models.sh
 # Not sure if multistaged is useful here, keep it like that if it is
 FROM python:3.10-slim
 
-COPY --from=build grpc ./recommendations_service.py .env ./
+COPY --from=build grpc ./recommendations_service.py ./
 COPY --from=build /opt/venv /opt/venv
 
 ENV VIRTUAL_ENV=/opt/venv
