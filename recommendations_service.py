@@ -12,6 +12,8 @@ from pke.lang import stopwords
 from logger import init_logger
 from loguru import logger
 
+from recommendation_interceptor import UnaryInterceptor
+
 # TODO : Better logs (account service's json + format) + Class doc
 
 class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
@@ -58,7 +60,7 @@ def serve():
     port = get_required_env_variable("RECOMMENDATIONS_SERVICE_PORT");
     max_workers = os.getenv("RECOMMENDATIONS_SERVICE_MAX_WORKERS") or 8;
     
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers))
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers), interceptors=[UnaryInterceptor()])
     
     pb2_grpc.add_RecommendationsServiceServicer_to_server(RecommendationsService(), server)
 

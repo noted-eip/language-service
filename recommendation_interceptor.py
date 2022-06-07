@@ -2,8 +2,9 @@ from grpc_interceptor import ServerInterceptor
 from grpc_interceptor.exceptions import GrpcException, Internal
 from loguru import logger
 import grpc, time
+from typing import Callable, Any
 
-class ExceptionToStatusInterceptor(ServerInterceptor):
+class UnaryInterceptor(ServerInterceptor):
     def intercept(
         self,
         method: Callable,
@@ -14,8 +15,7 @@ class ExceptionToStatusInterceptor(ServerInterceptor):
         try:
             duration = time.time()            
             res = method(request, context)
-            duration = time.time() - timer;
-            # possible to wrap those two lines below in a function
+            duration = time.time() - duration;
             with logger.contextualize(time=duration, method=method_name):
                 logger.info("rpc")
             return res
@@ -26,4 +26,5 @@ class ExceptionToStatusInterceptor(ServerInterceptor):
             context.set_details(e.details)
             raise
         except Exception as e:
+            logger.error(e)
             raise Internal(f"Internal server error occured: {e}")
