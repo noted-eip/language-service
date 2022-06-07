@@ -28,6 +28,6 @@ ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN python3 -m venv $VIRTUAL_ENV
 
-ENTRYPOINT [ "python3", "-u" "recommendations_service.py" ]
+ENTRYPOINT [ "python3", "-u", "recommendations_service.py" ]
 
 EXPOSE 3000
