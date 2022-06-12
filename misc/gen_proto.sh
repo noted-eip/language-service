@@ -13,9 +13,6 @@ rm -rf "${GRPC_FOLDER}/${SERVICE_NAME}pb" "${SERVICE_NAME}pb" && \
 # Generate protobufs files in the right folder
 $PROTOC_TOOL --python_out="${GRPC_FOLDER}" --grpc_python_out="${GRPC_FOLDER}" "${GRPC_FOLDER#./}/protos/${SERVICE_NAME}/"*.proto --proto_path="${GRPC_FOLDER}/protos" && \
 
-# Create __init__.py to easily import python files
-touch "${GRPC_FOLDER}/${SERVICE_NAME}/__init__.py" && \
-
 # Rename the folder to keep Noted's convention
 mv "${GRPC_FOLDER}/${SERVICE_NAME}" "${GRPC_FOLDER}/${SERVICE_NAME}pb" && \
 

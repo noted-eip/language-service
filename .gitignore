@@ -28,3 +28,6 @@ recommendationspb
 
 # Python
 __pycache__
+
+# Unit tests
+.coverage
