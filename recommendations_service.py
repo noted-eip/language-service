@@ -1,6 +1,4 @@
 import os, sys, json
-from dotenv import load_dotenv 
-from concurrent import futures 
 
 import grpc
 import recommendationspb.recommendations_pb2_grpc as pb2_grpc
@@ -9,12 +7,9 @@ import recommendationspb.recommendations_pb2 as pb2
 import pke
 from pke.lang import stopwords 
 
-from logger import init_logger
 from loguru import logger
 
-from recommendation_interceptor import UnaryInterceptor
-
-# TODO : Better logs (account service's json + format) + Class doc
+# TODO: Class documentation
 
 class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
 
@@ -28,7 +23,8 @@ class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
         self.threshold           = float(os.getenv("RECOMMENDATIONS_SERVICE_THRESHOLD")            or 0.75)            
 
     def __candidate_selection_and_weighting(self):
-        logger.debug(f"Candidate selection : n gram length: {self.n_gram_length} ; co occurence window: {self.co_occurence_window}")
+        with logger.contextualize(n_gram_length=self.n_gram_length, co_occurence_window=self.co_occurence_window):
+            logger.debug(f"Candidate selection")
         self.extractor.candidate_selection(n=self.n_gram_length)
         self.extractor.candidate_weighting(window=self.co_occurence_window, use_stems=False)
 
@@ -47,31 +43,3 @@ class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
         result = {'keywords': keywords}
 
         return pb2.ExtractKeywordsReply(**result)
-
-# TODO: utils.py or utils/env.py
-def get_required_env_variable(name: str) -> str:
-    result = os.getenv(name);
-    if result is None:
-        raise EnvironmentError(f"Please set the {name} env variable")
-    return result
-
-# TODO: server.py or main.py
-def serve():
-    port = get_required_env_variable("RECOMMENDATIONS_SERVICE_PORT");
-    max_workers = os.getenv("RECOMMENDATIONS_SERVICE_MAX_WORKERS") or 8;
-    
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers), interceptors=[UnaryInterceptor()])
-    
-    pb2_grpc.add_RecommendationsServiceServicer_to_server(RecommendationsService(), server)
-
-    logger.info(f"Opening server on port {port}")
-    
-    server.add_insecure_port(f'[::]:{port}')
-    server.start()
-    server.wait_for_termination()
-
-# TODO: main.py
-if __name__ == '__main__':
-    init_logger()
-    load_dotenv()
-    serve()

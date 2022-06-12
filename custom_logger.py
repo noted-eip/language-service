@@ -11,5 +11,5 @@ def __sink(message):
     print(__serialize(message.record))
 
 def init_logger():
-    logger.remove(0)
+    logger.remove()
     logger.add(__sink)
