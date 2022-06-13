@@ -36,14 +36,15 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install coverage flake8
+        misc/gen_proto.sh
+        misc/download_language_models.sh
     - name: Check errors with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        ls -la
     - name: Test with `unittest`
       run: |
-        misc/gen_proto.sh
-        misc/download_language_models.sh
         # `--branch` adds logic branch informations and `--locals` print variables that are still on the stack when a test fails
         coverage run --branch -m unittest --locals tests_recommendations.py
     - name: Get coverage
