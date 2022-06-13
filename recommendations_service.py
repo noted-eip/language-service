@@ -40,6 +40,4 @@ class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
 
         keywords = [keyword_info[0] for keyword_info in keywords_verbose]
 
-        result = {'keywords': keywords}
-
-        return pb2.ExtractKeywordsReply(**result)
+        return pb2.ExtractKeywordsReply(keywords=keywords)

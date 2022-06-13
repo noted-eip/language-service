@@ -73,7 +73,5 @@ class TestRecommendationsService(unittest.TestCase):
         for keyword in keywords:
             self.assertTrue(keyword in content)
 
-
-
 if __name__ == '__main__':
     unittest.main()
