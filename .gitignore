@@ -25,3 +25,9 @@ recommendationspb
 
 # IDE
 .vscode
+
+# Python
+__pycache__
+
+# Unit tests
+.coverage

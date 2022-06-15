@@ -48,15 +48,22 @@ misc/gen_proto.sh
 ## Run the service
 
 ```bash
-python3 recommendations-service.py
+python3 recommendations_service.py
 ```
 
 ## Docker
 
+The docker image uses [BuildKit](https://github.com/moby/buildkit)'s cache features. Since the `requirements.txt` and the language model download are quite long (~10 minutes all together), they're both cached.
 In order to build the `recommendations-service` docker image use the Makefile rule:
 
 ```bash
-make build 
+DOCKER_BUILDKIT=1 make build 
+```
+
+or if you already activated BuildKit 
+
+```
+make build
 ```
 
 Same for running

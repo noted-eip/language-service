@@ -3,3 +3,7 @@
 
 # Github
 .github
+
+# Python cache
+.pytest_cache
+__pycache__

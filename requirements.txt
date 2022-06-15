@@ -6,3 +6,5 @@ git+https://github.com/boudinfl/pke.git # Keyword Extraction Toolkit
 # gRPC deps
 grpcio-tools==1.46.3
 googleapis-common-protos==1.56.1
+grpcio-testing==1.46.3
+grpc-interceptor==0.14.1
