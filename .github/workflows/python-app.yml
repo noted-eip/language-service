@@ -36,7 +36,6 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install coverage flake8
-        misc/gen_proto.sh
         misc/download_language_models.sh
     - name: Check errors with flake8
       run: |

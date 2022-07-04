@@ -1,17 +1,15 @@
 import os, sys, json
 
 import grpc
-import recommendationspb.recommendations_pb2_grpc as pb2_grpc
-import recommendationspb.recommendations_pb2 as pb2
+import protorepo.noted.recommendations.v1.recommendations_pb2_grpc as pb2_grpc
+import protorepo.noted.recommendations.v1.recommendations_pb2      as pb2
 
 import pke
 from pke.lang import stopwords 
 
 from loguru import logger
 
-# TODO: Class documentation
-
-class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
+class RecommendationsAPI(pb2_grpc.RecommendationsAPIServicer):
 
     extractor = pke.unsupervised.YAKE()
 
@@ -29,7 +27,6 @@ class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
         self.extractor.candidate_weighting(window=self.co_occurence_window, use_stems=False)
 
     def ExtractKeywords(self, request, context):
-        logger.info("ExtractKeywords request being processed")
         self.extractor.load_document(input=request.content,
                                      language=self.lang,
                                      stoplist=stopwords[self.lang],
@@ -40,4 +37,19 @@ class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
 
         keywords = [keyword_info[0] for keyword_info in keywords_verbose]
 
-        return pb2.ExtractKeywordsReply(keywords=keywords)
+        return pb2.ExtractKeywordsResponse(keywords=keywords)
+
+    def ExtractKeywordsBatch(self, request, context):
+        keywords_batch = []
+        for text_to_analyze in request.content:
+            self.extractor.load_document(input=text_to_analyze,
+                                        language=self.lang,
+                                        stoplist=stopwords[self.lang],
+                                        normalization=None)
+            self.__candidate_selection_and_weighting()
+            
+            keywords_verbose = self.extractor.get_n_best(n=self.number_of_results, threshold=self.threshold)
+            
+            keywords.append([keyword_info[0] for keyword_info in keywords_verbose])
+
+        return pb2.ExtractKeywordsBatchResponse(keywords_array=keywords_batch)

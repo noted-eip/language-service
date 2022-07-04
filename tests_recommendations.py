@@ -1,4 +1,4 @@
-from recommendations_service import RecommendationsService
+from recommendations_service import RecommendationsAPI
 import recommendationspb.recommendations_pb2 as pb2
 
 from collections import namedtuple
@@ -8,7 +8,7 @@ from loguru import logger
 
 import os , grpc, grpc_testing, unittest
 
-class TestRecommendationsService(unittest.TestCase):
+class TestRecommendationsAPI(unittest.TestCase):
     def __init__(self, methodName):
         super().__init__(methodName)
         init_logger()
@@ -16,7 +16,7 @@ class TestRecommendationsService(unittest.TestCase):
 
     def setUp(self):        
         servicers = {
-            pb2.DESCRIPTOR.services_by_name['RecommendationsService']: RecommendationsService()
+            pb2.DESCRIPTOR.services_by_name['RecommendationsAPI']: RecommendationsAPI()
         }
 
         self.test_server = grpc_testing.server_from_dictionary(
@@ -30,11 +30,12 @@ class TestRecommendationsService(unittest.TestCase):
 
         extract_keywords_method = self.test_server.invoke_unary_unary(
             method_descriptor=(pb2.DESCRIPTOR
-                                .services_by_name['RecommendationsService']
+                                .services_by_name['RecommendationsAPI']
                                 .methods_by_name['ExtractKeywords']),
             invocation_metadata={},
             request=request, 
-            timeout=None)
+            timeout=None
+        )
 
         response, metadata, code, details = extract_keywords_method.termination()
 
@@ -57,11 +58,12 @@ class TestRecommendationsService(unittest.TestCase):
 
         extract_keywords_method = self.test_server.invoke_unary_unary(
             method_descriptor=(pb2.DESCRIPTOR
-                                .services_by_name['RecommendationsService']
+                                .services_by_name['RecommendationsAPI']
                                 .methods_by_name['ExtractKeywords']),
             invocation_metadata={},
             request=request, 
-            timeout=None)
+            timeout=None
+        )
 
         response, metadata, code, details = extract_keywords_method.termination()
 
