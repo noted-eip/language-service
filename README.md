@@ -1,6 +1,6 @@
 # Recommandations Service
 
-Service that'll permit to have recommandations based on other's user notes.
+Service that'll permit to make natural language processing operations.
 
 ## Setup
 
@@ -36,15 +36,6 @@ models_array=("fr_dep_news_trf")
 ```bash
 misc/download_languages.sh
 ```
-
-### Generate protobuf files
-
-Run the bash script in the `misc` folder
-
-```bash
-misc/gen_proto.sh
-```
-
 ## Run the service
 
 ```bash
