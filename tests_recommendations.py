@@ -1,5 +1,5 @@
 from recommendations_service import RecommendationsAPI
-import recommendationspb.recommendations_pb2 as pb2
+import protorepo.noted.recommendations.v1.recommendations_pb2 as pb2
 
 from collections import namedtuple
 
@@ -73,7 +73,41 @@ class TestRecommendationsAPI(unittest.TestCase):
         keywords = response.keywords
         self.assertEqual(len(keywords), number_of_keywords)
         for keyword in keywords:
-            self.assertTrue(keyword in content)
+            self.assertTrue(keyword.lower() in content.lower())
+
+    def test_extract_keywords_batch_valid_request(self):
+        """ expect to get multiple keywords for each text 
+        """
+        number_of_keywords = os.getenv("RECOMMENDATIONS_SERVICE_NUMBER_OF_KEYWORDS") or 5 # TODO: defaults.py
+
+        request = pb2.ExtractKeywordsBatchRequest()
+        request.contents.append("Historiens ont ignoré Vichy et collaboration. Comité d'histoire de la seconde guerre mondiale créé en 1951 brise le mythe resistancialiste dans les années 1960")
+        request.contents.append("Plusieurs facteurs expliquent cette évolution: déclin du parti communiste, mort du général de gaulle en 1970, nouvelles générations n'ont plus ce besoin de glorifier la france")
+        request.contents.append("Robert Paxton publie la france de vichy en 1972 montre complicité vichy dans déportation 75 000 juifs")
+
+        extract_keywords_batch_method = self.test_server.invoke_unary_unary(
+            method_descriptor=(pb2.DESCRIPTOR
+                                .services_by_name['RecommendationsAPI']
+                                .methods_by_name['ExtractKeywordsBatch']),
+            invocation_metadata={},
+            request=request, 
+            timeout=None
+        )
+
+        response, metadata, code, details = extract_keywords_batch_method.termination()
+
+        self.assertEqual(code, grpc.StatusCode.OK)
+        self.assertTrue(hasattr(response, 'keywords_array'))
+
+        keywords_array = response.keywords_array
+        self.assertEqual(len(keywords_array), len(request.contents))
+        for (keywords_object, content) in zip(keywords_array, request.contents):
+            self.assertTrue(hasattr(keywords_object, 'keywords'))
+            keywords = keywords_object.keywords
+            self.assertEqual(len(keywords), number_of_keywords)
+            for single_keyword in keywords:
+                self.assertTrue(single_keyword.lower() in content.lower())
+
 
 if __name__ == '__main__':
     unittest.main()

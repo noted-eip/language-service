@@ -12,9 +12,9 @@ from loguru import logger
 def serve():
     port = get_required_env_variable("RECOMMENDATIONS_SERVICE_PORT");
     max_workers = os.getenv("RECOMMENDATIONS_SERVICE_MAX_WORKERS") or 8;
-    
+
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers), interceptors=[UnaryInterceptor()])
-    
+
     pb2_grpc.add_RecommendationsAPIServicer_to_server(RecommendationsAPI(), server)
 
     with logger.contextualize(port=port):

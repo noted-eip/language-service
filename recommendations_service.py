@@ -40,16 +40,9 @@ class RecommendationsAPI(pb2_grpc.RecommendationsAPIServicer):
         return pb2.ExtractKeywordsResponse(keywords=keywords)
 
     def ExtractKeywordsBatch(self, request, context):
-        keywords_batch = []
-        for text_to_analyze in request.content:
-            self.extractor.load_document(input=text_to_analyze,
-                                        language=self.lang,
-                                        stoplist=stopwords[self.lang],
-                                        normalization=None)
-            self.__candidate_selection_and_weighting()
-            
-            keywords_verbose = self.extractor.get_n_best(n=self.number_of_results, threshold=self.threshold)
-            
-            keywords.append([keyword_info[0] for keyword_info in keywords_verbose])
-
-        return pb2.ExtractKeywordsBatchResponse(keywords_array=keywords_batch)
+        response = pb2.ExtractKeywordsBatchResponse()
+        tmp_request = pb2.ExtractKeywordsRequest()
+        for text_to_analyze in request.contents:
+            tmp_request.content = text_to_analyze
+            response.keywords_array.append(self.ExtractKeywords(tmp_request, context))
+        return response
