@@ -1,5 +1,5 @@
 from recommendations_service import RecommendationsAPI
-import protorepo.noted.recommendations.v1.recommendations_pb2 as pb2
+import protorepo.noted.recommendations.v1.recommendations_pb2 as recommendationspb
 
 from collections import namedtuple
 
@@ -16,7 +16,7 @@ class TestRecommendationsAPI(unittest.TestCase):
 
     def setUp(self):        
         servicers = {
-            pb2.DESCRIPTOR.services_by_name['RecommendationsAPI']: RecommendationsAPI()
+            recommendationspb.DESCRIPTOR.services_by_name['RecommendationsAPI']: RecommendationsAPI()
         }
 
         self.test_server = grpc_testing.server_from_dictionary(
@@ -26,10 +26,10 @@ class TestRecommendationsAPI(unittest.TestCase):
         """ expect to get an empty response response 
         """
         content = ""
-        request = pb2.ExtractKeywordsRequest(content=content)
+        request = recommendationspb.ExtractKeywordsRequest(content=content)
 
         extract_keywords_method = self.test_server.invoke_unary_unary(
-            method_descriptor=(pb2.DESCRIPTOR
+            method_descriptor=(recommendationspb.DESCRIPTOR
                                 .services_by_name['RecommendationsAPI']
                                 .methods_by_name['ExtractKeywords']),
             invocation_metadata={},
@@ -46,7 +46,7 @@ class TestRecommendationsAPI(unittest.TestCase):
     def test_extract_keywords_invalid_request_field(self):
         """ expect to get a ValueError 
         """
-        self.assertRaises(ValueError, pb2.ExtractKeywordsRequest, invalid_field="")
+        self.assertRaises(ValueError, recommendationspb.ExtractKeywordsRequest, invalid_field="")
 
     def test_extract_keywords_valid_request(self):
         """ expect to get multiple keywords that are in the text 
@@ -54,10 +54,10 @@ class TestRecommendationsAPI(unittest.TestCase):
         number_of_keywords = os.getenv("RECOMMENDATIONS_SERVICE_NUMBER_OF_KEYWORDS") or 5 # TODO: defaults.py
 
         content = "Les mathématiques se distinguent des autres sciences par un rapport particulier au réel car l'observation et l'expérience ne s'y portent pas sur des objets physiques ; les mathématiques ne sont pas une science empirique. Elles sont de nature entièrement intellectuelle, fondées sur des axiomes déclarés vrais ou sur des postulats provisoirement admis."
-        request = pb2.ExtractKeywordsRequest(content=content)
+        request = recommendationspb.ExtractKeywordsRequest(content=content)
 
         extract_keywords_method = self.test_server.invoke_unary_unary(
-            method_descriptor=(pb2.DESCRIPTOR
+            method_descriptor=(recommendationspb.DESCRIPTOR
                                 .services_by_name['RecommendationsAPI']
                                 .methods_by_name['ExtractKeywords']),
             invocation_metadata={},
@@ -80,13 +80,13 @@ class TestRecommendationsAPI(unittest.TestCase):
         """
         number_of_keywords = os.getenv("RECOMMENDATIONS_SERVICE_NUMBER_OF_KEYWORDS") or 5 # TODO: defaults.py
 
-        request = pb2.ExtractKeywordsBatchRequest()
+        request = recommendationspb.ExtractKeywordsBatchRequest()
         request.contents.append("Historiens ont ignoré Vichy et collaboration. Comité d'histoire de la seconde guerre mondiale créé en 1951 brise le mythe resistancialiste dans les années 1960")
         request.contents.append("Plusieurs facteurs expliquent cette évolution: déclin du parti communiste, mort du général de gaulle en 1970, nouvelles générations n'ont plus ce besoin de glorifier la france")
         request.contents.append("Robert Paxton publie la france de vichy en 1972 montre complicité vichy dans déportation 75 000 juifs")
 
         extract_keywords_batch_method = self.test_server.invoke_unary_unary(
-            method_descriptor=(pb2.DESCRIPTOR
+            method_descriptor=(recommendationspb.DESCRIPTOR
                                 .services_by_name['RecommendationsAPI']
                                 .methods_by_name['ExtractKeywordsBatch']),
             invocation_metadata={},

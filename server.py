@@ -1,5 +1,5 @@
 import os, grpc
-import protorepo.noted.recommendations.v1.recommendations_pb2_grpc as pb2_grpc
+import protorepo.noted.recommendations.v1.recommendations_pb2_grpc as recommendationspb_grpc
 
 from utils.env import get_required_env_variable
 
@@ -15,7 +15,7 @@ def serve():
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=max_workers), interceptors=[UnaryInterceptor()])
 
-    pb2_grpc.add_RecommendationsAPIServicer_to_server(RecommendationsAPI(), server)
+    recommendationspb_grpc.add_RecommendationsAPIServicer_to_server(RecommendationsAPI(), server)
 
     with logger.contextualize(port=port):
         logger.info(f"Opening server")

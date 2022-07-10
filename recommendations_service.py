@@ -1,15 +1,15 @@
 import os, sys, json
 
 import grpc
-import protorepo.noted.recommendations.v1.recommendations_pb2_grpc as pb2_grpc
-import protorepo.noted.recommendations.v1.recommendations_pb2      as pb2
+import protorepo.noted.recommendations.v1.recommendations_pb2_grpc as recommendationspb_grpc
+import protorepo.noted.recommendations.v1.recommendations_pb2      as recommendationspb
 
 import pke
 from pke.lang import stopwords 
 
 from loguru import logger
 
-class RecommendationsAPI(pb2_grpc.RecommendationsAPIServicer):
+class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
 
     extractor = pke.unsupervised.YAKE()
 
@@ -37,11 +37,11 @@ class RecommendationsAPI(pb2_grpc.RecommendationsAPIServicer):
 
         keywords = [keyword_info[0] for keyword_info in keywords_verbose]
 
-        return pb2.ExtractKeywordsResponse(keywords=keywords)
+        return recommendationspb.ExtractKeywordsResponse(keywords=keywords)
 
     def ExtractKeywordsBatch(self, request, context):
-        response = pb2.ExtractKeywordsBatchResponse()
-        tmp_request = pb2.ExtractKeywordsRequest()
+        response = recommendationspb.ExtractKeywordsBatchResponse()
+        tmp_request = recommendationspb.ExtractKeywordsRequest()
         for text_to_analyze in request.contents:
             tmp_request.content = text_to_analyze
             response.keywords_array.append(self.ExtractKeywords(tmp_request, context))
