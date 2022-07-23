@@ -1,17 +1,15 @@
 import os, sys, json
 
 import grpc
-import recommendationspb.recommendations_pb2_grpc as pb2_grpc
-import recommendationspb.recommendations_pb2 as pb2
+import protorepo.noted.recommendations.v1.recommendations_pb2_grpc as recommendationspb_grpc
+import protorepo.noted.recommendations.v1.recommendations_pb2      as recommendationspb
 
 import pke
 from pke.lang import stopwords 
 
 from loguru import logger
 
-# TODO: Class documentation
-
-class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
+class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
 
     extractor = pke.unsupervised.YAKE()
 
@@ -29,7 +27,6 @@ class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
         self.extractor.candidate_weighting(window=self.co_occurence_window, use_stems=False)
 
     def ExtractKeywords(self, request, context):
-        logger.info("ExtractKeywords request being processed")
         self.extractor.load_document(input=request.content,
                                      language=self.lang,
                                      stoplist=stopwords[self.lang],
@@ -40,4 +37,12 @@ class RecommendationsService(pb2_grpc.RecommendationsServiceServicer):
 
         keywords = [keyword_info[0] for keyword_info in keywords_verbose]
 
-        return pb2.ExtractKeywordsReply(keywords=keywords)
+        return recommendationspb.ExtractKeywordsResponse(keywords=keywords)
+
+    def ExtractKeywordsBatch(self, request, context):
+        response = recommendationspb.ExtractKeywordsBatchResponse()
+        tmp_request = recommendationspb.ExtractKeywordsRequest()
+        for text_to_analyze in request.contents:
+            tmp_request.content = text_to_analyze
+            response.keywords_array.append(self.ExtractKeywords(tmp_request, context))
+        return response

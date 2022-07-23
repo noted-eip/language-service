@@ -17,7 +17,6 @@ COPY . .
 RUN --mount=type=cache,id=pip-cache,target=/root/.cache/pip pip install -r requirements.txt
 
 RUN ./misc/download_language_models.sh
-RUN ./misc/gen_proto.sh
 
 # Not sure if multistaged is useful here, keep it like that if it is
 FROM python:3.10-slim
@@ -26,8 +25,7 @@ WORKDIR /app
 
 COPY --from=build /app/*.py ./
 COPY --from=build /app/utils ./utils
-COPY --from=build /app/grpc ./grpc
-COPY --from=build /app/recommendationspb ./recommendationspb
+COPY --from=build /app/protorepo ./protorepo
 
 COPY --from=build /opt/venv /opt/venv
 
