@@ -1,13 +1,13 @@
-import os, sys, json
+import os
 
-import grpc
 import protorepo.noted.recommendations.v1.recommendations_pb2_grpc as recommendationspb_grpc
-import protorepo.noted.recommendations.v1.recommendations_pb2      as recommendationspb
+import protorepo.noted.recommendations.v1.recommendations_pb2 as recommendationspb
 
 import pke
-from pke.lang import stopwords 
+from pke.lang import stopwords
 
 from loguru import logger
+
 
 class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
 
@@ -15,14 +15,14 @@ class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
 
     def __init__(self, *args, **kwargs):
         self.lang                =       os.getenv("RECOMMENDATIONS_SERVICE_LANG")                 or 'fr'
-        self.number_of_results   = int  (os.getenv("RECOMMENDATIONS_SERVICE_NUMBER_OF_KEYWORDS")   or 5   )  
-        self.n_gram_length       = int  (os.getenv("RECOMMENDATIONS_SERVICE_N_GRAM_LENGTH")        or 2   ) # between 1 and 3
-        self.co_occurence_window = int  (os.getenv("RECOMMENDATIONS_SERVICE_CO_OCCURENCE_WINDOW")  or 3   )  
-        self.threshold           = float(os.getenv("RECOMMENDATIONS_SERVICE_THRESHOLD")            or 0.75)            
+        self.number_of_results   = int  (os.getenv("RECOMMENDATIONS_SERVICE_NUMBER_OF_KEYWORDS")   or 5   )
+        self.n_gram_length       = int  (os.getenv("RECOMMENDATIONS_SERVICE_N_GRAM_LENGTH")        or 2   )
+        self.co_occurence_window = int  (os.getenv("RECOMMENDATIONS_SERVICE_CO_OCCURENCE_WINDOW")  or 3   )
+        self.threshold           = float(os.getenv("RECOMMENDATIONS_SERVICE_THRESHOLD")            or 0.75)
 
     def __candidate_selection_and_weighting(self):
         with logger.contextualize(n_gram_length=self.n_gram_length, co_occurence_window=self.co_occurence_window):
-            logger.debug(f"Candidate selection")
+            logger.debug("Candidate selection")
         self.extractor.candidate_selection(n=self.n_gram_length)
         self.extractor.candidate_weighting(window=self.co_occurence_window, use_stems=False)
 

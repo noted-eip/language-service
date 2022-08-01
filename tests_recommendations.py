@@ -1,20 +1,20 @@
 from recommendations_service import RecommendationsAPI
 import protorepo.noted.recommendations.v1.recommendations_pb2 as recommendationspb
 
-from collections import namedtuple
-
 from custom_logger import init_logger
-from loguru import logger
 
-import os , grpc, grpc_testing, unittest
+import os
+import grpc
+import grpc_testing
+import unittest
+
 
 class TestRecommendationsAPI(unittest.TestCase):
     def __init__(self, methodName):
         super().__init__(methodName)
         init_logger()
 
-
-    def setUp(self):        
+    def setUp(self):
         servicers = {
             recommendationspb.DESCRIPTOR.services_by_name['RecommendationsAPI']: RecommendationsAPI()
         }
@@ -23,17 +23,17 @@ class TestRecommendationsAPI(unittest.TestCase):
             servicers, grpc_testing.strict_real_time())
 
     def test_extract_keywords_empty_request(self):
-        """ expect to get an empty response response 
+        """ expect to get an empty response response
         """
         content = ""
         request = recommendationspb.ExtractKeywordsRequest(content=content)
 
         extract_keywords_method = self.test_server.invoke_unary_unary(
             method_descriptor=(recommendationspb.DESCRIPTOR
-                                .services_by_name['RecommendationsAPI']
-                                .methods_by_name['ExtractKeywords']),
+                               .services_by_name['RecommendationsAPI']
+                               .methods_by_name['ExtractKeywords']),
             invocation_metadata={},
-            request=request, 
+            request=request,
             timeout=None
         )
 
@@ -44,24 +44,24 @@ class TestRecommendationsAPI(unittest.TestCase):
         self.assertEqual(response.keywords, [])
 
     def test_extract_keywords_invalid_request_field(self):
-        """ expect to get a ValueError 
+        """ expect to get a ValueError
         """
         self.assertRaises(ValueError, recommendationspb.ExtractKeywordsRequest, invalid_field="")
 
     def test_extract_keywords_valid_request(self):
-        """ expect to get multiple keywords that are in the text 
+        """ expect to get multiple keywords that are in the text
         """
-        number_of_keywords = os.getenv("RECOMMENDATIONS_SERVICE_NUMBER_OF_KEYWORDS") or 5 # TODO: defaults.py
+        number_of_keywords = os.getenv("RECOMMENDATIONS_SERVICE_NUMBER_OF_KEYWORDS") or 5  # TODO: defaults.py
 
         content = "Les mathématiques se distinguent des autres sciences par un rapport particulier au réel car l'observation et l'expérience ne s'y portent pas sur des objets physiques ; les mathématiques ne sont pas une science empirique. Elles sont de nature entièrement intellectuelle, fondées sur des axiomes déclarés vrais ou sur des postulats provisoirement admis."
         request = recommendationspb.ExtractKeywordsRequest(content=content)
 
         extract_keywords_method = self.test_server.invoke_unary_unary(
             method_descriptor=(recommendationspb.DESCRIPTOR
-                                .services_by_name['RecommendationsAPI']
-                                .methods_by_name['ExtractKeywords']),
+                               .services_by_name['RecommendationsAPI']
+                               .methods_by_name['ExtractKeywords']),
             invocation_metadata={},
-            request=request, 
+            request=request,
             timeout=None
         )
 
@@ -76,9 +76,9 @@ class TestRecommendationsAPI(unittest.TestCase):
             self.assertTrue(keyword.lower() in content.lower())
 
     def test_extract_keywords_batch_valid_request(self):
-        """ expect to get multiple keywords for each text 
+        """ expect to get multiple keywords for each text
         """
-        number_of_keywords = os.getenv("RECOMMENDATIONS_SERVICE_NUMBER_OF_KEYWORDS") or 5 # TODO: defaults.py
+        number_of_keywords = os.getenv("RECOMMENDATIONS_SERVICE_NUMBER_OF_KEYWORDS") or 5  # TODO: defaults.py
 
         request = recommendationspb.ExtractKeywordsBatchRequest()
         request.contents.append("Historiens ont ignoré Vichy et collaboration. Comité d'histoire de la seconde guerre mondiale créé en 1951 brise le mythe resistancialiste dans les années 1960")
@@ -87,10 +87,10 @@ class TestRecommendationsAPI(unittest.TestCase):
 
         extract_keywords_batch_method = self.test_server.invoke_unary_unary(
             method_descriptor=(recommendationspb.DESCRIPTOR
-                                .services_by_name['RecommendationsAPI']
-                                .methods_by_name['ExtractKeywordsBatch']),
+                               .services_by_name['RecommendationsAPI']
+                               .methods_by_name['ExtractKeywordsBatch']),
             invocation_metadata={},
-            request=request, 
+            request=request,
             timeout=None
         )
 
