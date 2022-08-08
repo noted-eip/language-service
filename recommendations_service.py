@@ -6,7 +6,15 @@ import protorepo.noted.recommendations.v1.recommendations_pb2 as recommendations
 import pke
 from pke.lang import stopwords
 
+from summa.summarizer import summarize
+
 from loguru import logger
+
+
+LANG_NAMES = {
+    'fr': 'french',
+    'en': 'english'
+}
 
 
 class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
@@ -48,3 +56,7 @@ class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
             tmp_request.content = text_to_analyze
             response.keywords_array.append(self.ExtractKeywords(tmp_request, context))
         return response
+
+    def Summarize(self, request, context):
+        result = summarize(request.content, language=LANG_NAMES[self.lang], additional_stopwords=stopwords[self.lang])
+        return recommendationspb.SummarizeResponse(result=result)
