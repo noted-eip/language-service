@@ -24,16 +24,18 @@ class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
         with logger.contextualize(n_gram_length=self.n_gram_length, co_occurence_window=self.co_occurence_window):
             logger.debug("Candidate selection")
         self.extractor.candidate_selection(n=self.n_gram_length)
-        self.extractor.candidate_weighting(window=self.co_occurence_window, use_stems=False)
+        self.extractor.candidate_weighting(window=self.co_occurence_window, use_stems=True)
 
     def ExtractKeywords(self, request, context):
         self.extractor.load_document(input=request.content,
                                      language=self.lang,
                                      stoplist=stopwords[self.lang],
-                                     normalization=None)
+                                     normalization='lemmatization')
         self.__candidate_selection_and_weighting()
 
-        keywords_verbose = self.extractor.get_n_best(n=self.number_of_results, threshold=self.threshold)
+        keywords_verbose = self.extractor.get_n_best(n=self.number_of_results,
+                                                     threshold=self.threshold,
+                                                     stemming=True)  # TODO: abstract in a function
 
         keywords = [keyword_info[0] for keyword_info in keywords_verbose]
 

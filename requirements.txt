@@ -1,7 +1,7 @@
 python-dotenv==0.20.0
 loguru==0.6.0
 
-git+https://github.com/boudinfl/pke.git # Keyword Extraction Toolkit
+git+https://github.com/boudinfl/pke.git@refs/pull/189/merge # Keyword Extraction Toolkit with lemmatization
 
 # gRPC deps
 grpcio-tools==1.46.3
