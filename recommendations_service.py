@@ -58,5 +58,10 @@ class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
         return response
 
     def Summarize(self, request, context):
-        result = summarize(request.content, language=LANG_NAMES[self.lang], additional_stopwords=stopwords[self.lang])
+        REDUCED_RATIO = 0.4
+        text_input = request.content
+        result = summarize(text_input,
+                           words=(REDUCED_RATIO * len(text_input.split())),
+                           language=LANG_NAMES[self.lang],
+                           additional_stopwords=stopwords[self.lang])
         return recommendationspb.SummarizeResponse(summary=result)
