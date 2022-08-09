@@ -59,4 +59,4 @@ class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
 
     def Summarize(self, request, context):
         result = summarize(request.content, language=LANG_NAMES[self.lang], additional_stopwords=stopwords[self.lang])
-        return recommendationspb.SummarizeResponse(result=result)
+        return recommendationspb.SummarizeResponse(summary=result)
