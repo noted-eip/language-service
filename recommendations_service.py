@@ -58,7 +58,7 @@ class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
         return response
 
     def Summarize(self, request, context):
-        REDUCED_RATIO = 0.4
+        REDUCED_RATIO = float(os.getenv("RECOMMENDATIONS_SERVICE_SUMMARIZE_REDUCED_RATIO") or 0.4)
         text_input = request.content
         result = summarize(text_input,
                            words=(REDUCED_RATIO * len(text_input.split())),
