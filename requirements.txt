@@ -4,6 +4,9 @@ loguru==0.6.0
 git+https://github.com/boudinfl/pke.git@refs/pull/189/merge # Keyword Extraction Toolkit with lemmatization
 summa==1.2.0 # Summarization framework
 
+# SpaCy models
+fr-dep-news-trf @ https://github.com/explosion/spacy-models/releases/download/fr_dep_news_trf-3.3.0/fr_dep_news_trf-3.3.0-py3-none-any.whl
+
 # gRPC deps
 grpcio-tools==1.46.3
 googleapis-common-protos==1.56.1

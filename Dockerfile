@@ -16,8 +16,6 @@ COPY . .
 
 RUN --mount=type=cache,id=pip-cache,target=/root/.cache/pip pip install -r requirements.txt
 
-RUN ./misc/download_language_models.sh
-
 # Not sure if multistaged is useful here, keep it like that if it is
 FROM python:3.10-slim
 
