@@ -6,7 +6,15 @@ import protorepo.noted.recommendations.v1.recommendations_pb2 as recommendations
 import pke
 from pke.lang import stopwords
 
+from summa.summarizer import summarize
+
 from loguru import logger
+
+
+LANG_NAMES = {
+    'fr': 'french',
+    'en': 'english'
+}
 
 
 class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
@@ -24,16 +32,18 @@ class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
         with logger.contextualize(n_gram_length=self.n_gram_length, co_occurence_window=self.co_occurence_window):
             logger.debug("Candidate selection")
         self.extractor.candidate_selection(n=self.n_gram_length)
-        self.extractor.candidate_weighting(window=self.co_occurence_window, use_stems=False)
+        self.extractor.candidate_weighting(window=self.co_occurence_window, use_stems=True)
 
     def ExtractKeywords(self, request, context):
         self.extractor.load_document(input=request.content,
                                      language=self.lang,
                                      stoplist=stopwords[self.lang],
-                                     normalization=None)
+                                     normalization='lemmatization')
         self.__candidate_selection_and_weighting()
 
-        keywords_verbose = self.extractor.get_n_best(n=self.number_of_results, threshold=self.threshold)
+        keywords_verbose = self.extractor.get_n_best(n=self.number_of_results,
+                                                     threshold=self.threshold,
+                                                     stemming=True)  # TODO: abstract in a function
 
         keywords = [keyword_info[0] for keyword_info in keywords_verbose]
 
@@ -46,3 +56,12 @@ class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
             tmp_request.content = text_to_analyze
             response.keywords_array.append(self.ExtractKeywords(tmp_request, context))
         return response
+
+    def Summarize(self, request, context):
+        REDUCED_RATIO = float(os.getenv("RECOMMENDATIONS_SERVICE_SUMMARIZE_REDUCED_RATIO") or 0.4)
+        text_input = request.content
+        result = summarize(text_input,
+                           words=(REDUCED_RATIO * len(text_input.split())),
+                           language=LANG_NAMES[self.lang],
+                           additional_stopwords=stopwords[self.lang])
+        return recommendationspb.SummarizeResponse(summary=result)
