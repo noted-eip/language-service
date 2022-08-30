@@ -1,8 +1,10 @@
 from grpc_interceptor import ServerInterceptor
 from grpc_interceptor.exceptions import GrpcException, Internal
 from loguru import logger
-import grpc, time
 from typing import Callable, Any
+import grpc
+import time
+
 
 class UnaryInterceptor(ServerInterceptor):
     def intercept(
@@ -13,9 +15,9 @@ class UnaryInterceptor(ServerInterceptor):
         method_name: str,
     ) -> Any:
         try:
-            duration = time.time()            
+            duration = time.time()
             res = method(request, context)
-            duration = time.time() - duration;
+            duration = time.time() - duration
             with logger.contextualize(time=duration, method=method_name):
                 logger.info("rpc")
             return res

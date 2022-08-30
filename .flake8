@@ -1,0 +1,16 @@
+[flake8]
+max-line-length=120
+show-source=true
+statistics=true
+ignore= # Space before and after operator, to permit more readability
+    E221,
+    E222,
+    E272,
+    E211,
+    E202,
+    E241
+exclude=
+    ./protorepo/**/*
+per-file-ignores=
+    ./tests_recommendations.py: E501 
+    # Line length for long test texts
