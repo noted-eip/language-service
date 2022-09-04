@@ -1,0 +1,53 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Run tests
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+# During tests, some dependancies enable DeprecationWarnings that are by default disabled,
+# since other dependancies have some, we force them to be disabled for testing purposes
+env:
+  PYTHONWARNINGS: "ignore::DeprecationWarning"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          # Good luck
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install coverage flake8
+      - name: Lint with flake8
+        run: |
+          # Lint with deactivated whitespace before/after operator check, and deactivated line length for unit tests file
+          flake8
+      - name: Check errors with flake8
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+      - name: Test with `unittest`
+        run: |
+          # `--branch` adds logic branch informations and `--locals` print variables that are still on the stack when a test fails
+          coverage run --branch -m unittest --locals tests_recommendations.py
+      - name: Get coverage
+        run: |
+          # Shows coverage with all missing branches and lines, ignoring the test file itself and protobug generated files
+          coverage report --show-missing --omit="tests_recommendations.py,protorepo/*"
