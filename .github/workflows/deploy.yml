@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - "main"
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,7 +11,7 @@ jobs:
         with:
           submodules: true
       - name: Docker build
-        run: docker build --rm=false -t ghcr.io/noted-eip/recommendations-service:latest .
+        run: DOCKER_BUILDKIT=1 docker build --rm=false -t ghcr.io/noted-eip/recommendations-service:latest .
       - name: Login to GitHub Package Registry
         uses: docker/login-action@v1
         with:
