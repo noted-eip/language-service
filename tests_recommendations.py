@@ -7,9 +7,6 @@ import os
 import grpc
 import grpc_testing
 import unittest
-# import spacy
-# import pke
-import yake
 
 lang = os.getenv('RECOMMENDATIONS_SERVICE_LANG') or 'fr'
 nlp = None
