@@ -7,30 +7,18 @@ import os
 import grpc
 import grpc_testing
 import unittest
-import spacy
-import pke
+# import spacy
+# import pke
+import yake
 
 lang = os.getenv('RECOMMENDATIONS_SERVICE_LANG') or 'fr'
 nlp = None
-
-
-def grant_same_nlp_options_as_framework():
-    global nlp
-    # pke/ready.py as reference
-    all_models = [model for model in spacy.util.get_installed_models() if model[:2] == lang]
-
-    assert len(all_models) >= 1, "You must install at least one spacy model in your lang."
-
-    nlp = spacy.load(all_models[0], disable=['ner', 'textcat', 'parser'])
-    nlp.add_pipe('sentencizer')
-    nlp.tokenizer.infix_finditer = pke.readers.infix_re.finditer
 
 
 class TestRecommendationsAPI(unittest.TestCase):
     def __init__(self, methodName):
         super().__init__(methodName)
         init_logger()
-        grant_same_nlp_options_as_framework()
 
     def setUp(self):
         servicers = {
@@ -39,14 +27,6 @@ class TestRecommendationsAPI(unittest.TestCase):
 
         self.test_server = grpc_testing.server_from_dictionary(
             servicers, grpc_testing.strict_real_time())
-
-    def __lemmatize(self, content) -> str:
-        spacy_doc = nlp(content)
-        sentences = spacy_doc.sents
-        res = ""
-        for sentence in sentences:
-            res += ' '.join(token.lemma_ for token in sentence)
-        return res
 
     def test_extract_keywords_empty_request(self):
         """ expect to get an empty response response
@@ -98,7 +78,6 @@ class TestRecommendationsAPI(unittest.TestCase):
 
         keywords = response.keywords
         self.assertEqual(len(keywords), number_of_keywords)
-        content = self.__lemmatize(content).lower()
         for keyword in keywords:
             self.assertTrue(keyword.lower() in content.lower())
 
@@ -133,7 +112,6 @@ class TestRecommendationsAPI(unittest.TestCase):
             keywords = keywords_object.keywords
             self.assertEqual(len(keywords), number_of_keywords)
 
-            content = self.__lemmatize(content).lower()
             for single_keyword in keywords:
                 self.assertTrue(single_keyword.lower() in content.lower())
 
