@@ -3,12 +3,9 @@ import os
 import protorepo.noted.recommendations.v1.recommendations_pb2_grpc as recommendationspb_grpc
 import protorepo.noted.recommendations.v1.recommendations_pb2 as recommendationspb
 
-import pke
-from pke.lang import stopwords
+import yake
 
 from summa.summarizer import summarize
-
-from loguru import logger
 
 
 LANG_NAMES = {
@@ -19,31 +16,22 @@ LANG_NAMES = {
 
 class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
 
-    extractor = pke.unsupervised.YAKE()
-
     def __init__(self, *args, **kwargs):
         self.lang                =       os.getenv("RECOMMENDATIONS_SERVICE_LANG")                 or 'fr'
         self.number_of_results   = int  (os.getenv("RECOMMENDATIONS_SERVICE_NUMBER_OF_KEYWORDS")   or 5   )
         self.n_gram_length       = int  (os.getenv("RECOMMENDATIONS_SERVICE_N_GRAM_LENGTH")        or 2   )
         self.co_occurence_window = int  (os.getenv("RECOMMENDATIONS_SERVICE_CO_OCCURENCE_WINDOW")  or 3   )
         self.threshold           = float(os.getenv("RECOMMENDATIONS_SERVICE_THRESHOLD")            or 0.75)
-
-    def __candidate_selection_and_weighting(self):
-        with logger.contextualize(n_gram_length=self.n_gram_length, co_occurence_window=self.co_occurence_window):
-            logger.debug("Candidate selection")
-        self.extractor.candidate_selection(n=self.n_gram_length)
-        self.extractor.candidate_weighting(window=self.co_occurence_window, use_stems=True)
+        self.extractor = yake.KeywordExtractor(
+            lan=self.lang,
+            n=self.n_gram_length,
+            windowsSize=self.co_occurence_window,
+            top=self.number_of_results,
+            dedupLim=self.threshold
+        )
 
     def ExtractKeywords(self, request, context):
-        self.extractor.load_document(input=request.content,
-                                     language=self.lang,
-                                     stoplist=stopwords[self.lang],
-                                     normalization='lemmatization')
-        self.__candidate_selection_and_weighting()
-
-        keywords_verbose = self.extractor.get_n_best(n=self.number_of_results,
-                                                     threshold=self.threshold,
-                                                     stemming=True)  # TODO: abstract in a function
+        keywords_verbose = self.extractor.extract_keywords(request.content)
 
         keywords = [keyword_info[0] for keyword_info in keywords_verbose]
 
@@ -62,6 +50,5 @@ class RecommendationsAPI(recommendationspb_grpc.RecommendationsAPIServicer):
         text_input = request.content
         result = summarize(text_input,
                            words=(REDUCED_RATIO * len(text_input.split())),
-                           language=LANG_NAMES[self.lang],
-                           additional_stopwords=stopwords[self.lang])
+                           language=LANG_NAMES[self.lang])
         return recommendationspb.SummarizeResponse(summary=result)
