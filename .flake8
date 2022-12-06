@@ -2,7 +2,7 @@
 max-line-length=120
 show-source=true
 statistics=true
-ignore= # Space before and after operator, to permit more readability
+ignore=
     E221,
     E222,
     E272,
@@ -12,5 +12,4 @@ ignore= # Space before and after operator, to permit more readability
 exclude=
     ./protorepo/**/*
 per-file-ignores=
-    ./tests_recommendations.py: E501 
-    # Line length for long test texts
+    ./tests_language.py: E501 
