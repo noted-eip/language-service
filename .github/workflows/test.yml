@@ -46,8 +46,8 @@ jobs:
       - name: Test with `unittest`
         run: |
           # `--branch` adds logic branch informations and `--locals` print variables that are still on the stack when a test fails
-          coverage run --branch -m unittest --locals tests_recommendations.py
+          coverage run --branch -m unittest --locals tests_language.py
       - name: Get coverage
         run: |
           # Shows coverage with all missing branches and lines, ignoring the test file itself and protobug generated files
-          coverage report --show-missing --omit="tests_recommendations.py,protorepo/*"
+          coverage report --show-missing --omit="tests_language.py,protorepo/*"
