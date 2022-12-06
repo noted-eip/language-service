@@ -7,7 +7,7 @@ update-submodules:
 	git submodule update --remote
 
 build: init-submodules update-submodules
-	docker build -t recommendations-service -f Dockerfile .
+	docker build -t language-service -f Dockerfile .
 
 run:
-	docker run -p 3000:3000 recommendations-service
+	docker run -p 3000:3000 language-service

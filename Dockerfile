@@ -1,4 +1,4 @@
-# This image is meant for building the recommendations-service and generating
+# This image is meant for building the language-service and generating
 # protobuf code in a consistent way.
 FROM python:3.10-slim as build
 
@@ -27,7 +27,7 @@ COPY --from=build /app/protorepo ./protorepo
 
 COPY --from=build /opt/venv /opt/venv
 
-ENV RECOMMENDATIONS_SERVICE_PORT=${PORT:-3000}
+ENV LANGUAGE_SERVICE_PORT=${PORT:-3000}
 
 ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"

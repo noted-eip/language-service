@@ -1,5 +1,5 @@
-from recommendations_service import RecommendationsAPI
-import protorepo.noted.recommendations.v1.recommendations_pb2 as recommendationspb
+from language_service import LanguageAPI
+import protorepo.noted.language.v1.language_pb2 as languagepb
 
 from custom_logger import init_logger
 
@@ -8,18 +8,18 @@ import grpc
 import grpc_testing
 import unittest
 
-lang = os.getenv('RECOMMENDATIONS_SERVICE_LANG') or 'fr'
+lang = os.getenv('LANGUAGE_SERVICE_LANG') or 'fr'
 nlp = None
 
 
-class TestRecommendationsAPI(unittest.TestCase):
+class TestLanguageAPI(unittest.TestCase):
     def __init__(self, methodName):
         super().__init__(methodName)
         init_logger()
 
     def setUp(self):
         servicers = {
-            recommendationspb.DESCRIPTOR.services_by_name['RecommendationsAPI']: RecommendationsAPI()
+            languagepb.DESCRIPTOR.services_by_name['LanguageAPI']: LanguageAPI()
         }
 
         self.test_server = grpc_testing.server_from_dictionary(
@@ -29,11 +29,11 @@ class TestRecommendationsAPI(unittest.TestCase):
         """ expect to get an empty response response
         """
         content = ""
-        request = recommendationspb.ExtractKeywordsRequest(content=content)
+        request = languagepb.ExtractKeywordsRequest(content=content)
 
         extract_keywords_method = self.test_server.invoke_unary_unary(
-            method_descriptor=(recommendationspb.DESCRIPTOR
-                               .services_by_name['RecommendationsAPI']
+            method_descriptor=(languagepb.DESCRIPTOR
+                               .services_by_name['LanguageAPI']
                                .methods_by_name['ExtractKeywords']),
             invocation_metadata={},
             request=request,
@@ -49,19 +49,19 @@ class TestRecommendationsAPI(unittest.TestCase):
     def test_extract_keywords_invalid_request_field(self):
         """ expect to get a ValueError
         """
-        self.assertRaises(ValueError, recommendationspb.ExtractKeywordsRequest, invalid_field="")
+        self.assertRaises(ValueError, languagepb.ExtractKeywordsRequest, invalid_field="")
 
     def test_extract_keywords_valid_request(self):
         """ expect to get multiple keywords that are in the text
         """
-        number_of_keywords = os.getenv("RECOMMENDATIONS_SERVICE_NUMBER_OF_KEYWORDS") or 5  # TODO: defaults.py
+        number_of_keywords = os.getenv("LANGUAGE_SERVICE_NUMBER_OF_KEYWORDS") or 5  # TODO: defaults.py
 
         content = "Les mathématiques se distinguent des autres sciences par un rapport particulier au réel car l'observation et l'expérience ne s'y portent pas sur des objets physiques ; les mathématiques ne sont pas une science empirique. Elles sont de nature entièrement intellectuelle, fondées sur des axiomes déclarés vrais ou sur des postulats provisoirement admis."
-        request = recommendationspb.ExtractKeywordsRequest(content=content)
+        request = languagepb.ExtractKeywordsRequest(content=content)
 
         extract_keywords_method = self.test_server.invoke_unary_unary(
-            method_descriptor=(recommendationspb.DESCRIPTOR
-                               .services_by_name['RecommendationsAPI']
+            method_descriptor=(languagepb.DESCRIPTOR
+                               .services_by_name['LanguageAPI']
                                .methods_by_name['ExtractKeywords']),
             invocation_metadata={},
             request=request,
@@ -81,16 +81,16 @@ class TestRecommendationsAPI(unittest.TestCase):
     def test_extract_keywords_batch_valid_request(self):
         """ expect to get multiple keywords for each text
         """
-        number_of_keywords = os.getenv("RECOMMENDATIONS_SERVICE_NUMBER_OF_KEYWORDS") or 5  # TODO: defaults.py
+        number_of_keywords = os.getenv("LANGUAGE_SERVICE_NUMBER_OF_KEYWORDS") or 5  # TODO: defaults.py
 
-        request = recommendationspb.ExtractKeywordsBatchRequest()
+        request = languagepb.ExtractKeywordsBatchRequest()
         request.contents.append("Historiens ont ignoré Vichy et collaboration. Comité d'histoire de la seconde guerre mondiale créé en 1951 brise le mythe resistancialiste dans les années 1960")
         request.contents.append("Plusieurs facteurs expliquent cette évolution: déclin du parti communiste, mort du général de gaulle en 1970, nouvelles générations n'ont plus ce besoin de glorifier la france")
         request.contents.append("Robert Paxton publie la france de vichy en 1972 montre complicité vichy dans déportation 75000 juifs")
 
         extract_keywords_batch_method = self.test_server.invoke_unary_unary(
-            method_descriptor=(recommendationspb.DESCRIPTOR
-                               .services_by_name['RecommendationsAPI']
+            method_descriptor=(languagepb.DESCRIPTOR
+                               .services_by_name['LanguageAPI']
                                .methods_by_name['ExtractKeywordsBatch']),
             invocation_metadata={},
             request=request,
@@ -115,15 +115,15 @@ class TestRecommendationsAPI(unittest.TestCase):
     def test_summarize_valid_request(self):
         """ expect to get a summary of the text
         """
-        REDUCED_RATIO              = float(os.getenv("RECOMMENDATIONS_SERVICE_SUMMARIZE_REDUCED_RATIO") or 0.4)
+        REDUCED_RATIO              = float(os.getenv("LANGUAGE_SERVICE_SUMMARIZE_REDUCED_RATIO") or 0.4)
         PERCENTAGE_OF_WORDS_MARGIN = 0.1
 
         content = "À son retour en Angleterre, raconte Jean Lassègue, Alan Turing est recruté par le service britannique du chiffre, le Government Code and Cypher School, qui vient de s’installer à Bletchley Park, près d’Oxford. Le but de cette unité : déchiffrer les messages ­radios que les Nazis échangent avec leur redoutable flotte de sous-marins. Grâce à l’ingéniosité de Turing et de ses collègues, la plupart des messages allemands interceptés sont décryptés dès 1942. Selon l’historien Philippe Breton, du laboratoire Culture et société en Europe, à Strasbourg, des dizai­nes de milliers de vies humaines ont été épargnées grâce cette prouesse. Pour Shaun Wylie, ami d’Alan rencontré à Princeton et retrouvé à Bletchley Park, « mieux valut que la sécurité ne sut rien de son homosexualité : il aurait sans doute été viré et nous aurions perdu la guerre… ». Après la guerre, Turing peut enfin se consacrer à la matérialisation de la machine idéale conçue dans son article de 1936. Il entre au Laboratoire national de physique, près de Londres, où il rédige en trois mois le projet de construction d’un prototype d’Automatic Computing Engine (ACE). Il ne s’agit pas d’un simple calculateur, comme pour les projets américains concurrents, mais d’une machine susceptible de traiter n’importe quel type de données. Les plans vite achevés, Turing laisse programmeurs et ingénieurs construire l’ACE, qui n’entrera en service qu’en 1950. Entre-temps, il a rejoint, en octobre 1948, l’équipe de Max Newman à l’université de Manchester."
-        request = recommendationspb.SummarizeRequest(content=content)
+        request = languagepb.SummarizeRequest(content=content)
 
         summary_method = self.test_server.invoke_unary_unary(
-            method_descriptor=(recommendationspb.DESCRIPTOR
-                               .services_by_name['RecommendationsAPI']
+            method_descriptor=(languagepb.DESCRIPTOR
+                               .services_by_name['LanguageAPI']
                                .methods_by_name['Summarize']),
             invocation_metadata={},
             request=request,
