@@ -34,7 +34,7 @@ jobs:
           # Good luck
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install coverage flake8
+          pip install coverage flake8 six
       - name: Lint with flake8
         run: |
           # Lint with deactivated whitespace before/after operator check, and deactivated line length for unit tests file
