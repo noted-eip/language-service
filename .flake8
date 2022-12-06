@@ -12,5 +12,5 @@ ignore= # Space before and after operator, to permit more readability
 exclude=
     ./protorepo/**/*
 per-file-ignores=
-    ./tests_recommendations.py: E501 
+    ./tests_language.py: E501 
     # Line length for long test texts
